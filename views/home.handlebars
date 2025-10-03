@@ -1,0 +1,7 @@
+<h1>Home - Productos</h1>
+<ul>
+{{#each products}}
+  <li>{{this.title}} - ${{this.price}} - <a href="/products/{{this.id}}">Ver</a></li>
+{{/each}}
+</ul>
+<a href="/realtimeproducts">Ver realtime products</a> | <a href="/products">Listado con paginación</a>

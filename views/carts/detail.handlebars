@@ -1,0 +1,6 @@
+<h1>Carrito {{cartId}}</h1>
+<ul>
+  {{#each products}}
+    <li>{{this.title}} - ${{this.price}} - Cant: {{this.quantity}}</li>
+  {{/each}}
+</ul>

@@ -1,0 +1,54 @@
+<h1>Real Time Products</h1>
+<div>
+  <form id="addForm">
+    <input name="title" placeholder="title" required />
+    <input name="description" placeholder="description" required />
+    <input name="code" placeholder="code" required />
+    <input name="price" type="number" placeholder="price" required />
+    <input name="status" type="text" placeholder="true/false" value="true" />
+    <input name="stock" type="number" placeholder="stock" value="10" />
+    <input name="category" placeholder="category" />
+    <button type="submit">Agregar (vía socket)</button>
+  </form>
+</div>
+
+<ul id="productsList">
+  {{#each products}}
+    <li data-id="{{this.id}}">{{this.title}} - ${{this.price}} <button class="delBtn" data-id="{{this.id}}">Eliminar</button></li>
+  {{/each}}
+</ul>
+
+<script>
+const socket = io();
+const list = document.getElementById('productsList');
+socket.on('products', (products) => {
+  list.innerHTML = '';
+  // products may come as object from getProducts; handle both cases
+  const arr = products.payload ? products.payload : products;
+  for (const p of arr) {
+    const li = document.createElement('li');
+    li.dataset.id = p.id;
+    li.innerHTML = `${p.title} - $${p.price} <button class="delBtn" data-id="${p.id}">Eliminar</button>`;
+    list.appendChild(li);
+  }
+});
+
+document.getElementById('addForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const obj = Object.fromEntries(fd.entries());
+  // normalize types
+  obj.price = Number(obj.price);
+  obj.status = obj.status === 'true';
+  obj.stock = Number(obj.stock);
+  socket.emit('newProduct', obj);
+  e.target.reset();
+});
+
+list.addEventListener('click', (e) => {
+  if (e.target.matches('.delBtn')) {
+    const id = e.target.dataset.id;
+    socket.emit('deleteProduct', id);
+  }
+});
+</script>
